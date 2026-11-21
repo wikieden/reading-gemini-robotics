@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 1 章 · 全景：两个模型、八次发布 · 读懂 Gemini Robotics</title>
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("ab-theme"),f=localStorage.getItem("ab-fs");if(t)d.dataset.theme=t;if(f)d.dataset.fs=f}catch(e){}})();</script>
+<style>:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa;--fs:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="light"]{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+:root[data-theme="sepia"]{--bg:#f6efe1;--fg:#3b3127;--mute:#7a6a58;--line:#e2d6bf;--card:#fbf6ec;--acc:#a0522d;--code:#ece2cd;--quote:#efe5d2}
+:root[data-theme="green"]{--bg:#e3eddf;--fg:#22301f;--mute:#566650;--line:#c9d8c3;--card:#eef5eb;--acc:#2e7d4f;--code:#d6e4d0;--quote:#dae7d5}
+:root[data-theme="navy"]{--bg:#0f1a2b;--fg:#dde6f3;--mute:#93a4bd;--line:#23324a;--card:#15233a;--acc:#6cc4ff;--code:#1a2a44;--quote:#16243b}
+:root[data-fs="s"]{--fs:15px}
+:root[data-fs="m"]{--fs:16px}
+:root[data-fs="l"]{--fs:18px}
+:root[data-fs="xl"]{--fs:20px}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:var(--fs)/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:6px 16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+.prefs{display:inline-flex;gap:4px;align-items:center}
+.prefs button,.prefs select,#nav-toggle{font:inherit;font-size:13px;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:1.75em;line-height:1.35;margin:8px 0 16px} h2{font-size:1.375em;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:1.125em;margin:28px 0 8px}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1180px;margin:0 auto}
+.layout main{margin:0;max-width:880px}
+nav.side{position:sticky;top:49px;align-self:start;max-height:calc(100vh - 49px);overflow-y:auto;padding:20px 8px 40px 16px;border-right:1px solid var(--line);font-size:14px;line-height:1.5}
+nav.side .h{font-weight:600;color:var(--mute);margin:4px 8px 8px;font-size:13px}
+nav.side a{display:block;padding:5px 8px;border-radius:6px;color:var(--fg);text-decoration:none}
+nav.side a:hover{background:var(--code)} nav.side a.cur{background:var(--quote);color:var(--acc);font-weight:600}
+nav.side a .n{color:var(--mute);margin-right:6px;font-variant-numeric:tabular-nums}
+#nav-toggle{display:none}
+@media (max-width:960px){.layout{display:block} nav.side{display:none;position:fixed;z-index:6;top:49px;left:0;bottom:0;width:min(300px,85vw);max-height:none;background:var(--bg);box-shadow:2px 0 12px rgba(0,0,0,.2)} nav.side.open{display:block} #nav-toggle{display:inline-block}}
+.run{display:flex;flex-wrap:wrap;align-items:center;gap:4px 0;margin:4px 0 12px}
+.run details{flex-basis:100%;margin:6px 0 0;font-size:.94em}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:.94em}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:1.06em;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<button type="button" id="nav-toggle" aria-label="打开章节列表">☰ 章节</button><a class="brand" href="../index.html">读懂 Gemini Robotics</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+<a href="https://wikieden.github.io/ai-books/glossary.html">全局词汇</a>
+<a href="https://wikieden.github.io/ai-books/">← 全部讲义书</a>
+<span class="prefs" title="字号与主题"><button type="button" data-fs-step="-1" aria-label="字号变小">A−</button><button type="button" data-fs-step="1" aria-label="字号变大">A+</button><select id="ab-theme" aria-label="主题色"><option value="">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option><option value="sepia">米黄护眼</option><option value="green">豆沙绿护眼</option><option value="navy">夜蓝</option></select></span>
+</div></header>
+<div class="layout"><nav class="side" aria-label="章节"><div class="h">读懂 Gemini Robotics</div><a href="index.html">讲义目录</a><a href="01-overview.html" class="cur"><span class="n">1</span>全景：两个模型、八次发布</a><a href="appendix-glossary.html">附录 · 缩写与术语表</a></nav><main>
+<h1 id="1">第 1 章 · 全景：两个模型、八次发布</h1><div class="run"><a class="btn" href="../animations/01-dual-model-loop.html">▶ 打开本章可交互动画</a></div>
+<blockquote>
+<p>本章回答：Gemini Robotics 到底是什么？为什么要拆成"想的模型"和"动的模型"两个？两者之间传的是什么？一个跑在云上的大模型，怎么让机器人每秒动 50 次？从 2025 年 3 月到 2026 年 11 月的八次发布，各加了什么？看官方的数字时要注意什么？<br />
+讲解日期：2026-11-20 · 上一章：无 · 下一章：第 2 章 前史：Google 机器人十年（待写）<br />
+对应原文：1.0 报告 <code>materials/text/papers/gemini-robotics-1.0-2503.20020.txt</code> §3.1 L825–L842；1.5 报告 <code>gemini-robotics-1.5-2510.03342.txt</code> §2.1 L141–L190；官方博客 <code>materials/text/articles/gr-2-blog.txt</code>、<code>gr-er-2-blog.txt</code>、<code>gr-2-5-blog.txt</code>；GR 2 安全报告 <code>materials/text/reports/gr-2-safety-report.txt</code> L33–L63。<br />
+本章缩写：GR = Gemini Robotics；VLA = Vision-Language-Action（视觉 / 语言 / 动作）；VLM = Vision-Language Model（视觉 / 语言 / 模型）；ER = Embodied Reasoning（具身 / 推理）；ERQA = Embodied Reasoning Question Answering（具身推理 / 问答）；MT = Motion Transfer（动作 / 迁移）；DoF = Degree of Freedom（自由 / 度）；API = Application Programming Interface（应用程序 / 编程 / 接口）；SDK = Software Development Kit（软件 / 开发 / 工具包）；OOD = Out-Of-Distribution（分布 / 之外）；Hz = Hertz（赫兹，每秒次数）；ms = millisecond（毫秒）；pp = percentage point（百分点）；ASIMOV（Google 的机器人语义安全 benchmark 系列，以科幻作家 Isaac Asimov 命名，不是缩写）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a>。</p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="gemini-robotics-2026-11-20">第一步：Gemini Robotics 是什么——一个工长加一个熟练工（2026-11-20）</h3>
+<p><strong>类比：装修队。</strong> 工长（看图纸、跟业主沟通、排工序、验收每一步）不亲手拧螺丝；熟练工（听一句"把这面墙刷了"就能干）不管整个工程的顺序。Gemini Robotics 就是这样一支队伍：</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>模型</th>
+<th>它是什么</th>
+<th>输入 → 输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工长（大脑）</td>
+<td><strong>Gemini Robotics-ER</strong>（ER = Embodied Reasoning，具身推理）</td>
+<td>一个 VLM，在 Gemini 上专门加强了"看懂物理世界"的能力</td>
+<td>图像 / 视频 / 语音 / 文字 → 文字、指点坐标、检测框、计划、工具调用</td>
+</tr>
+<tr>
+<td>熟练工（手）</td>
+<td><strong>Gemini Robotics</strong>（VLA）</td>
+<td>从 Gemini 微调出来、直接出动作的模型</td>
+<td>图像 + 一句短指令 + 机器人自身状态（proprioception，本体感觉：关节角等）→ 一串动作</td>
+</tr>
+<tr>
+<td>小号熟练工</td>
+<td><strong>Gemini Robotics On-Device</strong></td>
+<td>在机器人本地跑的小 VLA，底座是 Gemma（Google 的开放小模型）</td>
+<td>同上，但不联网</td>
+</tr>
+</tbody>
+</table>
+<p>GR 2 的博客把这三个模型并列介绍（<code>gr-2-blog.txt</code> L24–L30），并说 ER 2 是"机器人的高层大脑"（L62）。</p>
+<p><strong>每个模型背后都站着当时最新的 Gemini</strong>：1.0 建在 Gemini 2.0 上（1.0 报告 L109–L110），ER 2 建在 Gemini 3.5 Flash 上（<code>gr-er-2-card.txt</code> L37）。所以 Gemini Robotics 的核心赌注是：<strong>通用多模态大模型里已经有大量物理常识，只需要再教它"怎么动"</strong>。</p>
+<p><strong>开放程度</strong>（截至 2026-11）：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>谁能用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ER（1.5 起）</td>
+<td>任何开发者，通过 Gemini API / Google AI Studio（<code>gr-2-blog.txt</code> L42）</td>
+</tr>
+<tr>
+<td>VLA、On-Device</td>
+<td>只给合作伙伴和 Trusted Tester（受信测试者）（同上 L42；<code>gr-on-device-blog.txt</code> L78）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话</strong>：Gemini Robotics 是一个"ER 当大脑 + VLA 当手"的模型家族，赌的是通用大模型的物理常识能迁移到机器人上；能公开调用的只有 ER。</p>
+<h3 id="2026-11-20">第二步：两个模型之间传的是什么——一句话的子指令（2026-11-20）</h3>
+<p><strong>类比：工长对工人说话，用的是人话，不是图纸坐标。</strong> 工长说"把左边那箱瓷砖搬到厨房"，工人自己决定怎么弯腰、怎么抓。</p>
+<p>1.5 报告把这个系统叫做 agentic system（智能体系统），由两部分组成（L141–L152）：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>谁来当</th>
+<th>做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Orchestrator（编排者）</td>
+<td>GR-ER 1.5</td>
+<td>处理用户输入和环境反馈；把复杂任务拆成 VLA 能做的小步骤；<strong>做成功检测，决定什么时候进入下一步</strong>；需要时调用数字工具（搜索等）</td>
+</tr>
+<tr>
+<td>Action model（动作模型）</td>
+<td>GR 1.5（VLA）</td>
+<td>把编排者的指令翻译成底层动作；<strong>它对编排者来说就是一个工具</strong>，接收开放词汇的自然语言</td>
+</tr>
+</tbody>
+</table>
+<p>ER 2 的博客说得更直白：开发者把 VLA、导航 API 等底层控制接口<strong>声明成工具</strong>，ER 2 去调用它们（<code>gr-er-2-blog.txt</code> L94）。这和你给大模型配一个"搜索"工具是同一种用法，只是这个工具会让机械臂动起来。</p>
+<p><strong>例子</strong>：1.5 报告举的"为去伦敦出差收拾行李箱"（L169–L178），一共拆了四层：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>谁做</th>
+<th>例子</th>
+<th>时间尺度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户任务</td>
+<td>用户说</td>
+<td>"Pack the suitcase for a trip to London"</td>
+<td>整个任务</td>
+</tr>
+<tr>
+<td>子指令</td>
+<td>ER（查行程和天气后决定带什么）</td>
+<td>"把雨衣装进行李箱"</td>
+<td>几十秒</td>
+</tr>
+<tr>
+<td>短片段</td>
+<td>VLA 的思考</td>
+<td>"从衣柜里拿起雨衣"</td>
+<td>几秒</td>
+</tr>
+<tr>
+<td>原语动作</td>
+<td>VLA 的思考（再细一层）</td>
+<td>"把夹爪往左移""合上夹爪"</td>
+<td>不到一秒</td>
+</tr>
+</tbody>
+</table>
+<p>ER 和 VLA 之间的接口是第二层：<strong>一句自然语言</strong>。好处是两个模型可以分开升级（ER 1.5 → 1.6 → 2，VLA 不用跟着改）；代价是一句话能表达的东西有限（精确位置、力度说不清），这个张力后面第 8 章会再回来。</p>
+<p>GR 2 安全报告把这种分工叫"system 2 / system 1"架构（<code>gr-2-safety-report.txt</code> L38），并且指出编排者每次都在做一个<strong>路由决定</strong>（L63）：交给 VLA、问人、还是触发安全工具（急停）。第 13 章专门讲这个。</p>
+<p><strong>一句话</strong>：ER 把任务拆成一句句人话，把 VLA 当工具调用，并负责判断每一步做没做成。</p>
+<h3 id="50-hzaction-chunk2026-11-20">第三步：慢大脑怎么跑出 50 Hz——动作块（action chunk）补延迟（2026-11-20）</h3>
+<p><strong>类比：外卖。</strong> 厨房（云端大模型）出一单要 250 毫秒，你（机器人）每 20 毫秒就要吃一口。如果每单只送一口，你大部分时间在等；如果每单送 13 口，你吃完这一单时下一单刚好到。</p>
+<p>1.0 报告 §3.1 给出了这笔账（L830–L837）：</p>
+<ul>
+<li>VLA 拆成两半：<strong>云端 backbone</strong>（Gemini Robotics-ER 的蒸馏版，"distilled version"）+ <strong>机器人本地的 action decoder</strong>（动作解码器）。</li>
+<li>backbone 从"问到答"的延迟，从几秒优化到 <strong>160 ms 以内</strong>。</li>
+<li>加上本地 decoder，从原始观测到一块动作的端到端延迟约 <strong>250 ms</strong>。</li>
+<li>一块里有多个动作（引用了 ACT 的 action chunking），所以<strong>有效控制频率是 50 Hz</strong>。</li>
+</ul>
+<p><strong>公式</strong>：一次推理要覆盖的控制步数</p>
+<div class="arithmatex">\[K_{\min} = \lceil L \times f \rceil\]</div>
+<ul>
+<li><span class="arithmatex">\(L\)</span>（读作"L"，latency 延迟）：从拍照到一块动作送达的时间，单位秒。</li>
+<li><span class="arithmatex">\(f\)</span>（frequency 频率）：机器人执行动作的频率，单位 Hz（每秒几次）。</li>
+<li><span class="arithmatex">\(K\)</span>（chunk 长度）：一块里有几个动作。<span class="arithmatex">\(\lceil\ \rceil\)</span> 读作"向上取整"。</li>
+<li>如果 <span class="arithmatex">\(K &lt; L \times f\)</span>，每个周期都会有一段"动作用完、新块没到"的空档，稳态有效频率变成 <span class="arithmatex">\(K / L\)</span>。</li>
+</ul>
+<p><strong>例子</strong>（<span class="arithmatex">\(f = 50\)</span> Hz，即每步 20 ms）：</p>
+<table>
+<thead>
+<tr>
+<th>延迟 <span class="arithmatex">\(L\)</span></th>
+<th><span class="arithmatex">\(L \times f\)</span></th>
+<th><span class="arithmatex">\(K_{\min}\)</span></th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 ms</td>
+<td>5</td>
+<td>5</td>
+<td>本地小模型量级</td>
+</tr>
+<tr>
+<td>160 ms</td>
+<td>8</td>
+<td>8</td>
+<td>只算 backbone（1.0 报告的上限）</td>
+</tr>
+<tr>
+<td>250 ms</td>
+<td>12.5</td>
+<td><strong>13</strong></td>
+<td>端到端（1.0 报告）</td>
+</tr>
+</tbody>
+</table>
+<p>再看 <span class="arithmatex">\(L = 250\)</span> ms 时 chunk 不够长会怎样：</p>
+<table>
+<thead>
+<tr>
+<th>chunk <span class="arithmatex">\(K\)</span></th>
+<th>一块能覆盖</th>
+<th>每个 250 ms 周期</th>
+<th>稳态有效频率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>13</td>
+<td>260 ms</td>
+<td>不卡</td>
+<td>50 Hz</td>
+</tr>
+<tr>
+<td>10</td>
+<td>200 ms</td>
+<td>卡 50 ms</td>
+<td><span class="arithmatex">\(10 / 0.25 = 40\)</span> Hz</td>
+</tr>
+</tbody>
+</table>
+<p>注意：<strong>论文没有公开 chunk 长度</strong>，上面的 13 是按论文给的 250 ms 和 50 Hz 反推出来的"最低要求"。实际系统一般会让 chunk 比最低要求长一些、并在块与块之间做平滑；本地 decoder 也不只是"排队播放"，报告说它负责"补偿 backbone 的延迟"（L834），具体怎么补没写，第 4 章再细看。</p>
+<p><strong>一句话</strong>：大模型慢，就一次多给几步动作；延迟 × 频率 = 一块至少要覆盖的步数。</p>
+<h3 id="er-vla">动画演示：ER 编排 + VLA 动作块</h3>
+<p><img alt="双模型与动作块" src="../animations/01-dual-model-loop.gif" /></p>
+<p>可交互版：<a href="../animations/01-dual-model-loop.html">animations/01-dual-model-loop.html</a>（两个滑块：backbone 延迟 100–500 ms、chunk 长度 4–30 步）</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>最上面三张卡片是 ER 拆出来的三步（第二步）。每步要执行 45 个动作，做满了 ER 做成功检测、打勾、下发下一步。</li>
+<li>中间灰条是云端 backbone 的一次次推理，每条结束处的蓝点表示送达一个动作块，下面浅蓝条是这块能覆盖多长时间（第三步）。</li>
+<li>最下面每格是 20 ms 的一个控制步：绿 = 执行了一个动作，红 = 动作用完了、新块还没到，机器人卡住。</li>
+<li>GIF 里是延迟 250 ms、chunk 10 步：每个周期末尾都有一小段红，到 3 秒时第三步还没做完，有效频率 40 Hz。把 chunk 拖到 13，红色消失，三步在 3 秒内做完。</li>
+</ol>
+<h3 id="2026-11-20_1">第四步：八次发布，三条主线（2026-11-20）</h3>
+<p><strong>类比：一个手机系列。</strong> 每年都在"芯片（能力）、机型（本体）、安全"三条线上同时迭代；单看一次发布会容易被新名词淹没，按线看就清楚了。</p>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>发布</th>
+<th>能力线</th>
+<th>本体线</th>
+<th>安全线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-03</td>
+<td>GR 1.0 + ER + ERQA</td>
+<td>VLA 能做灵巧任务（折纸、装午餐盒）；ER 会指点、3D 检测</td>
+<td>ALOHA 2 双臂（主）；可适配双臂 Franka、Apollo 人形</td>
+<td>ASIMOV 语义安全 benchmark + 机器人"宪法"</td>
+</tr>
+<tr>
+<td>2025-06</td>
+<td>On-Device</td>
+<td>本地跑；SDK 支持 50–100 条示范适配（<code>gr-on-device-blog.txt</code> L22）</td>
+<td>双臂</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2025-09</td>
+<td>GR 1.5 + ER 1.5</td>
+<td><strong>先想再动</strong>（Thinking VLA）；ER 当 orchestrator、调工具</td>
+<td><strong>Motion Transfer</strong>：一个模型直接控制 ALOHA、双臂 Franka、Apollo（1.5 报告 L187–L195）</td>
+<td>安全推理写进编排</td>
+</tr>
+<tr>
+<td>2025-12</td>
+<td>Veo 世界模拟器评测</td>
+<td>用视频世界模型评测策略、做 OOD 和红队</td>
+<td>—</td>
+<td>红队</td>
+</tr>
+<tr>
+<td>2026-04</td>
+<td>ER 1.6</td>
+<td>多视角成功检测、仪表读数（agentic vision：放大 + 写代码）</td>
+<td>Spot 巡检</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2026-07</td>
+<td>GR 2 + ER 2 + On-Device 2</td>
+<td>ER 2 看连续视频判进度、Live API 流式编排、<strong>多机协作</strong></td>
+<td><strong>人形全身</strong>（走、蹲、伸手）；22 DoF 五指手；On-Device 2 几小时、&lt; 200 条示范适配新本体（<code>gr-2-blog.txt</code> L74）</td>
+<td>ASIMOV-Agentic：拒绝、求助、急停</td>
+</tr>
+<tr>
+<td>2026-10</td>
+<td>Gemini 4 Argon for Robotics</td>
+<td><strong>通用前沿模型</strong>直接控制、Real2Sim、事后标注、自改进；ERQA 87%（<code>argon-robotics-devblog.txt</code> L37）</td>
+<td>Spot、Franka 等</td>
+<td>Argon 在 agentic 机器人安全评测里领先</td>
+</tr>
+<tr>
+<td>2026-11</td>
+<td>GR 2.5</td>
+<td>200 多个任务、成功率高 30%–100%、快 20%–30%（<code>gr-2-5-blog.txt</code> L38–L40）；Argon 加速研发</td>
+<td>Apollo 2 进奔驰产线做配料，成功率 96%（L24）</td>
+<td>推理时安全引导；ASIMOV-Jailbreak</td>
+</tr>
+</tbody>
+</table>
+<p>三条线各自的走向：</p>
+<ul>
+<li><strong>能力</strong>：先让 VLA "会动"（1.0）→ 让它"先想再动"（1.5）→ 让 ER "看着视频盯进度"（2）→ 用前沿模型当研发引擎、扩大任务面（2.5 + Argon）。</li>
+<li><strong>本体</strong>：一个双臂平台 → 三种身体一个模型 → 人形全身 + 灵巧手 + 多机 → 工厂产线。</li>
+<li><strong>安全</strong>：语义安全问答 → 编排层的路由（拒绝 / 问人 / 急停）→ 对抗越狱和推理时引导。</li>
+</ul>
+<p><strong>一句话</strong>：八次发布按"能力、本体、安全"三条线读；1.0、1.5 有论文，之后只有博客和模型卡。</p>
+<h3 id="2026-11-20_2">第五步：读官方数字的三个问题（2026-11-20）</h3>
+<p><strong>类比：看商品广告。</strong> "比上一代快 30%"——跟哪一代比？30% 是多少的 30%？测了几次？</p>
+<p>官方博客里的数字大多是柱状图，读的时候先问三个问题：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>为什么要问</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>跟谁比</strong></td>
+<td>baseline（基线）往往是自家上一代，不是别家最强</td>
+<td>GR 2.5 的"30%–100% higher"是跟 previous baselines 比（<code>gr-2-5-blog.txt</code> L40）</td>
+</tr>
+<tr>
+<td><strong>绝对还是相对</strong></td>
+<td>0% → 93% 不可能是"相对提升"（从 0 涨多少倍都没意义）</td>
+<td>见下表</td>
+</tr>
+<tr>
+<td><strong>测了多少次</strong></td>
+<td>真机试验少，误差条很宽；20 次和 200 次的 60% 可信度差很多</td>
+<td>GR 2 博客的柱子带误差条（<code>gr-2-blog.txt</code> L34–L40），GR 2.5 博客的图注没写次数</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例子</strong>（数字来自 GR 2.5 博客图注，L48 等）：</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>GR 2 → GR 2.5</th>
+<th>绝对提升</th>
+<th>相对提升</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用夹子装糕点</td>
+<td>5% → 100%</td>
+<td>+95 个百分点（pp）</td>
+<td>×20</td>
+</tr>
+<tr>
+<td>合上工具箱盖</td>
+<td>0% → 93%</td>
+<td>+93 pp</td>
+<td>没有意义（旧值是 0）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>再一个换算</strong>：把"成功率"换成"失败率"往往更能看出差距。GR 2.5 博客说 Argon 的越狱抵抗率 99.5%，上一个基线 ER 2 是 82%（L80）：</p>
+<div class="arithmatex">\[\frac{1 - 0.82}{1 - 0.995} = \frac{0.18}{0.005} = 36\]</div>
+<p>被越狱成功的比例从 18% 降到 0.5%，<strong>降到原来的 1/36</strong>。而"82% → 99.5%"字面上只差 17.5 个百分点，看起来没那么夸张。</p>
+<p><strong>一句话</strong>：看官方数字先问跟谁比、绝对还是相对、测了几次；接近 100% 的数字换成失败率再比。</p>
+<h2 id="_2">练习与作答记录</h2>
+<p><strong>题 1</strong>（第二步 · 谁来做）：用户对家里的人形机器人说"把洗好的碗收进橱柜，柜子满了就告诉我"。（a）把这个任务拆成 ER 下发给 VLA 的几条子指令；（b）哪一步需要 ER 做成功检测？（c）"柜子满了"这件事应该由 ER 还是 VLA 发现？发现后 ER 的路由决定是交给 VLA、问人，还是急停？</p>
+<blockquote>
+<p>作答：（待作答）</p>
+</blockquote>
+<p><strong>题 2</strong>（第三步 · 延迟账）：（a）如果换了一个更大的 backbone，端到端延迟变成 400 ms，控制频率还是 50 Hz，一个 chunk 至少要多少步才不卡？（b）如果 chunk 只有 15 步，稳态有效频率是多少？每个周期卡多久？（可以用动画的滑块验证。）</p>
+<blockquote>
+<p>作答：（待作答）</p>
+</blockquote>
+<p><strong>题 3</strong>（第五步 · 读数字）：ER 2 博客说它把视频每一帧分进 5 档进度（0–20%、20–40%……），准确率 57.4%（<code>gr-er-2-blog.txt</code> L120）。（a）随便猜一档，期望准确率是多少？（b）57.4% 听起来不高，你会再追问哪一个问题来判断它到底好不好？</p>
+<blockquote>
+<p>作答：（待作答）</p>
+</blockquote>
+<h2 id="_3">口诀</h2>
+<blockquote>
+<p>工长拆活熟练工干，中间只传一句话；<br />
+大脑慢就一块多给，延迟乘频率是下限；<br />
+能力本体加安全，八次发布三条线；<br />
+跟谁比、绝对相对、测几次，近百就换失败率。</p>
+</blockquote>
+<h2 id="_4">本章复习卡片</h2>
+<p>GM01–GM06。练习做完后，按答错、卡住的地方补上。</p>
+<h2 id="_5">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_6">推荐阅读</h3>
+<table>
+<thead>
+<tr>
+<th>读什么</th>
+<th>读哪里</th>
+<th>读它为了什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★ Gemini Robotics 1.5 报告</td>
+<td>§1 引言（L29–L120）、§2.1 Model &amp; Architecture（L131–L190）</td>
+<td>双模型 agentic 系统、Thinking VLA、Motion Transfer 三件事的原始定义</td>
+</tr>
+<tr>
+<td>★ Gemini Robotics 1.0 报告</td>
+<td>§3.1 Model and Data（L825–L860）</td>
+<td>云端 backbone + 本地 decoder、160 / 250 ms、50 Hz、ALOHA 2 车队 12 个月的数据</td>
+</tr>
+<tr>
+<td>GR 2 博客</td>
+<td>全文（<code>gr-2-blog.txt</code>，155 行）</td>
+<td>三个模型的分工、全身控制和多机协作的公开数字</td>
+</tr>
+<tr>
+<td>ER 2 博客 + 模型卡</td>
+<td><code>gr-er-2-blog.txt</code> L86–L130；<code>gr-er-2-card.txt</code> L37</td>
+<td>"VLA 声明成工具"、进度分类、moment finding；ER 2 的底座</td>
+</tr>
+<tr>
+<td>GR 2.5 博客</td>
+<td>全文（<code>gr-2-5-blog.txt</code>，138 行）</td>
+<td>最新一代的数字、奔驰产线、ASIMOV-Jailbreak</td>
+</tr>
+<tr>
+<td>GR 2 安全报告</td>
+<td>§1 引言（<code>gr-2-safety-report.txt</code> L23–L72）</td>
+<td>"system 2 / system 1"和编排者的三种路由</td>
+</tr>
+<tr>
+<td>ACT（Action Chunking with Transformers）</td>
+<td><code>vla-deep-dive/materials/papers/01-precursors/act-aloha-2304.13705.pdf</code></td>
+<td>action chunking 的原始出处；本仓库 <a href="https://wikieden.github.io/vla-from-scratch/lessons/index.html">vla-deep-dive</a> 讲过</td>
+</tr>
+<tr>
+<td>本仓库 <a href="https://wikieden.github.io/vla-from-scratch/lessons/10-hierarchy.html">vla-deep-dive 第 10 章 分层</a></td>
+<td>全章</td>
+<td>分层 VLA 的一般做法，和 GR 的 ER + VLA 对照</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_7">数学原理</h3>
+<ul>
+<li><strong>向上取整</strong>：<span class="arithmatex">\(\lceil 12.5 \rceil = 13\)</span>。步数只能是整数，宁多勿少，少一步就会卡。</li>
+<li><strong>稳态频率</strong>：每个周期长 <span class="arithmatex">\(L\)</span>，执行 <span class="arithmatex">\(\min(K, Lf)\)</span> 个动作，所以有效频率 <span class="arithmatex">\(= \min(K/L,\ f)\)</span>。</li>
+<li><strong>绝对 vs 相对提升</strong>：绝对 <span class="arithmatex">\(= p_1 - p_0\)</span>（单位百分点）；相对 <span class="arithmatex">\(= p_1 / p_0\)</span>，<span class="arithmatex">\(p_0 = 0\)</span> 时没有定义。</li>
+<li><strong>失败率之比</strong>：比较两个接近 1 的成功率时，用 <span class="arithmatex">\((1-p_0)/(1-p_1)\)</span> 放大差距。</li>
+</ul>
+<h3 id="_8">公式清单</h3>
+<table>
+<thead>
+<tr>
+<th>公式</th>
+<th>意思</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(K_{\min} = \lceil L \times f \rceil\)</span></td>
+<td>一块动作至少要覆盖的控制步数</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(f_{\text{eff}} = \min(K / L,\ f)\)</span></td>
+<td>chunk 不够长时的稳态有效频率</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\Delta_{\text{abs}} = p_1 - p_0\)</span>，<span class="arithmatex">\(\Delta_{\text{rel}} = p_1 / p_0\)</span></td>
+<td>绝对提升（百分点）、相对提升（倍数）</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\((1 - p_0) / (1 - p_1)\)</span></td>
+<td>失败率降到原来的几分之一</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_9">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>纯 Python 标准库。代码在仓库本地 <code>gemini-robotics/solutions/chapter-code/ch01_overview.py</code>，配套测试 <code>tests/test_ch01.py</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd gemini-robotics/solutions/chapter-code  
+uv run python ch01_overview.py   # 一步一步打印  
+uv run pytest tests/test_ch01.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第三步 延迟账</td>
+<td><span class="arithmatex">\(K_{\min} = \lceil Lf \rceil\)</span></td>
+<td><code>min_chunk_len(0.25)</code></td>
+<td>13（100 ms → 5，160 ms → 8）</td>
+</tr>
+<tr>
+<td>第三步 卡顿</td>
+<td><span class="arithmatex">\(f_{\text{eff}} = \min(K/L, f)\)</span></td>
+<td><code>simulate_chunk_stream(250, 10)</code></td>
+<td>卡顿 540 ms / 2.75 s，40.0 Hz；<code>chunk=13</code> 时 0 ms，49.8 Hz</td>
+</tr>
+<tr>
+<td>第五步 绝对 / 相对</td>
+<td><span class="arithmatex">\(p_1 - p_0\)</span>，<span class="arithmatex">\(p_1/p_0\)</span></td>
+<td><code>gain(0.05, 1.00)</code></td>
+<td>+95 pp，×20；<code>gain(0, 0.93)</code> 相对为 <code>None</code></td>
+</tr>
+<tr>
+<td>第五步 失败率</td>
+<td><span class="arithmatex">\((1-p_0)/(1-p_1)\)</span></td>
+<td><code>failure_ratio(0.82, 0.995)</code></td>
+<td>36</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">dt = 1000 // hz                       # 50 Hz → 每步 20 ms
+for t in range(0, total_ms, dt):
+    while next_arrival &lt;= t:          # 新动作块到了
+        buffer, next_arrival = chunk, next_arrival + latency_ms  # 替换旧块，下一次请求马上发出
+    if t &lt; latency_ms: continue       # 开机等第一个块，不算卡顿
+    if buffer &gt; 0: buffer -= 1        # 执行一个动作
+    else: stalled += 1                # 没动作可执行：卡顿
+</code></pre>
+<p><strong>代码里才看得到的 3 件事</strong>：</p>
+<ol>
+<li>模拟按 20 ms 的整数格走，250 ms 的到达时刻落在两格之间，所以"卡顿 540 ms"不是精确的 <span class="arithmatex">\(11 \times 50\)</span> ms，而是格子取整后的结果；稳态频率仍然是 40 Hz。</li>
+<li><code>chunk=13</code> 时模拟出 49.8 Hz 而不是 50 Hz：统计区间从第一个块到达（250 ms）开始，第一格落在 260 ms，少算了一步。</li>
+<li>新块<strong>替换</strong>旧块（剩下的旧动作丢掉），这是最简单的做法；真实系统常在新旧块之间做平滑（如 ACT 的 temporal ensembling），第 4 章再讲。</li>
+</ol>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把 <code>CONTROL_HZ</code> 改成 30，看 250 ms 延迟下 <span class="arithmatex">\(K_{\min}\)</span> 变成多少。</li>
+<li>给 <code>simulate_chunk_stream</code> 加一个"新块不替换、而是接在旧块后面"的选项，比较两种做法的卡顿时长。</li>
+</ul><nav class="pager"><span></span><span></span></nav>
+</main></div>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/reading-gemini-robotics">github.com/wikieden/reading-gemini-robotics</a>。更多讲义书：<a href="https://wikieden.github.io/ai-books/">Physical AI 0-1-♾️（合集）</a></footer>
+<script>(function(){var d=document.documentElement,K=["s","m","l","xl"];
+function save(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
+var s=document.getElementById("ab-theme");if(s){s.value=d.dataset.theme||"";s.onchange=function(){if(s.value)d.dataset.theme=s.value;else delete d.dataset.theme;save("ab-theme",s.value)}}
+document.querySelectorAll("[data-fs-step]").forEach(function(b){b.onclick=function(){var i=K.indexOf(d.dataset.fs||"m")+(+b.dataset.fsStep);i=Math.max(0,Math.min(K.length-1,i));d.dataset.fs=K[i];save("ab-fs",K[i])}});
+var nb=document.getElementById("nav-toggle"),side=document.querySelector("nav.side");if(nb&&side){nb.onclick=function(){side.classList.toggle("open")}}
+var cur=side&&side.querySelector(".cur");if(cur)cur.scrollIntoView({block:"center"});
+})();</script>
+</body></html>

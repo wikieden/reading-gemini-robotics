@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附录 · 缩写与术语表 · 读懂 Gemini Robotics</title>
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("ab-theme"),f=localStorage.getItem("ab-fs");if(t)d.dataset.theme=t;if(f)d.dataset.fs=f}catch(e){}})();</script>
+<style>:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa;--fs:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="light"]{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+:root[data-theme="sepia"]{--bg:#f6efe1;--fg:#3b3127;--mute:#7a6a58;--line:#e2d6bf;--card:#fbf6ec;--acc:#a0522d;--code:#ece2cd;--quote:#efe5d2}
+:root[data-theme="green"]{--bg:#e3eddf;--fg:#22301f;--mute:#566650;--line:#c9d8c3;--card:#eef5eb;--acc:#2e7d4f;--code:#d6e4d0;--quote:#dae7d5}
+:root[data-theme="navy"]{--bg:#0f1a2b;--fg:#dde6f3;--mute:#93a4bd;--line:#23324a;--card:#15233a;--acc:#6cc4ff;--code:#1a2a44;--quote:#16243b}
+:root[data-fs="s"]{--fs:15px}
+:root[data-fs="m"]{--fs:16px}
+:root[data-fs="l"]{--fs:18px}
+:root[data-fs="xl"]{--fs:20px}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:var(--fs)/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:6px 16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+.prefs{display:inline-flex;gap:4px;align-items:center}
+.prefs button,.prefs select,#nav-toggle{font:inherit;font-size:13px;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:1.75em;line-height:1.35;margin:8px 0 16px} h2{font-size:1.375em;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:1.125em;margin:28px 0 8px}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1180px;margin:0 auto}
+.layout main{margin:0;max-width:880px}
+nav.side{position:sticky;top:49px;align-self:start;max-height:calc(100vh - 49px);overflow-y:auto;padding:20px 8px 40px 16px;border-right:1px solid var(--line);font-size:14px;line-height:1.5}
+nav.side .h{font-weight:600;color:var(--mute);margin:4px 8px 8px;font-size:13px}
+nav.side a{display:block;padding:5px 8px;border-radius:6px;color:var(--fg);text-decoration:none}
+nav.side a:hover{background:var(--code)} nav.side a.cur{background:var(--quote);color:var(--acc);font-weight:600}
+nav.side a .n{color:var(--mute);margin-right:6px;font-variant-numeric:tabular-nums}
+#nav-toggle{display:none}
+@media (max-width:960px){.layout{display:block} nav.side{display:none;position:fixed;z-index:6;top:49px;left:0;bottom:0;width:min(300px,85vw);max-height:none;background:var(--bg);box-shadow:2px 0 12px rgba(0,0,0,.2)} nav.side.open{display:block} #nav-toggle{display:inline-block}}
+.run{display:flex;flex-wrap:wrap;align-items:center;gap:4px 0;margin:4px 0 12px}
+.run details{flex-basis:100%;margin:6px 0 0;font-size:.94em}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:.94em}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:1.06em;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<button type="button" id="nav-toggle" aria-label="打开章节列表">☰ 章节</button><a class="brand" href="../index.html">读懂 Gemini Robotics</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+<a href="https://wikieden.github.io/ai-books/glossary.html">全局词汇</a>
+<a href="https://wikieden.github.io/ai-books/">← 全部讲义书</a>
+<span class="prefs" title="字号与主题"><button type="button" data-fs-step="-1" aria-label="字号变小">A−</button><button type="button" data-fs-step="1" aria-label="字号变大">A+</button><select id="ab-theme" aria-label="主题色"><option value="">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option><option value="sepia">米黄护眼</option><option value="green">豆沙绿护眼</option><option value="navy">夜蓝</option></select></span>
+</div></header>
+<div class="layout"><nav class="side" aria-label="章节"><div class="h">读懂 Gemini Robotics</div><a href="index.html">讲义目录</a><a href="01-overview.html"><span class="n">1</span>全景：两个模型、八次发布</a><a href="appendix-glossary.html" class="cur">附录 · 缩写与术语表</a></nav><main>
+<h1 id="_1">附录 · 缩写与术语表</h1>
+<blockquote>
+<p>用途：讲义里遇到缩写，先查这一页。每章开头的"本章缩写"只列这一章用到的。整理日期：2026-11-20。<br />
+写法：缩写 = 英文全称（逐词拆开的中文意思）；"第一次出现"指本书讲义里第一次出现的那一章。按字母排序。</p>
+</blockquote>
+<h2 id="_2">缩写</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td>Application Programming Interface</td>
+<td>应用程序 / 编程 / 接口：程序之间调用的约定</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>ASIMOV</td>
+<td>（不是缩写）以科幻作家 Isaac Asimov 命名</td>
+<td>Google 的机器人语义安全 benchmark 系列：ASIMOV、ASIMOV-2.0、ASIMOV-Agentic、ASIMOV-Jailbreak</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>DoF</td>
+<td>Degree of Freedom</td>
+<td>自由 / 度：能独立运动的关节数，如 22 DoF 的五指手</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>ER</td>
+<td>Embodied Reasoning</td>
+<td>具身 / 推理：理解物理世界的空间、时间、因果，为机器人服务的推理能力；也指 Gemini Robotics-ER 这个模型</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>ERQA</td>
+<td>Embodied Reasoning Question Answering</td>
+<td>具身推理 / 问答：GR 1.0 报告发布的开源 benchmark</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>GR</td>
+<td>Gemini Robotics</td>
+<td>Google DeepMind 的机器人模型家族；GR 1.5 即 Gemini Robotics 1.5</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>Hz</td>
+<td>Hertz</td>
+<td>赫兹：每秒几次</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>ms</td>
+<td>millisecond</td>
+<td>毫秒：千分之一秒</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>MT</td>
+<td>Motion Transfer</td>
+<td>动作 / 迁移：GR 1.5 让一个模型从多种机器人数据里学、并把技能迁移到别的身体上的训练方法</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>OOD</td>
+<td>Out-Of-Distribution</td>
+<td>分布 / 之外：训练数据里没见过的情况</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>pp</td>
+<td>percentage point</td>
+<td>百分点：两个百分比之差，如 5% → 100% 是 +95 pp</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>Software Development Kit</td>
+<td>软件 / 开发 / 工具包</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>VLA</td>
+<td>Vision-Language-Action</td>
+<td>视觉 / 语言 / 动作：输入图像和指令、直接输出机器人动作的模型</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>VLM</td>
+<td>Vision-Language Model</td>
+<td>视觉 / 语言 / 模型：输入图像和文字、输出文字的模型</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">术语</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action chunk（动作块）</td>
+<td>—</td>
+<td>模型一次输出的一串连续动作，机器人按控制频率逐个执行，用来补模型推理的延迟</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>action decoder（动作解码器）</td>
+<td>—</td>
+<td>GR 1.0 里跑在机器人本地的那一半 VLA，把云端 backbone 的输出变成动作块</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>action model（动作模型）</td>
+<td>—</td>
+<td>GR 1.5 agentic 系统里执行动作的一方，由 VLA 实现，对编排者来说是一个工具</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>backbone（主干）</td>
+<td>—</td>
+<td>GR 1.0 里跑在云端的那一半 VLA，是 Gemini Robotics-ER 的蒸馏版</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>baseline（基线）</td>
+<td>—</td>
+<td>用来比较的参照模型，官方博客里多半是自家上一代</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>distillation（蒸馏）</td>
+<td>—</td>
+<td>用大模型的输出训练一个更小更快的模型</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>Gemini 4 Argon</td>
+<td>—</td>
+<td>Google 2026 年的前沿通用模型；在机器人方向能直接控制、做 Real2Sim、事后标注、加速研发</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>On-Device</td>
+<td>—</td>
+<td>在机器人本地（不联网）跑的 Gemini Robotics 小模型，底座是 Gemma</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>orchestrator（编排者）</td>
+<td>—</td>
+<td>GR 1.5 agentic 系统里负责拆任务、调工具、判成败的一方，由 ER 实现</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>proprioception（本体感觉）</td>
+<td>—</td>
+<td>机器人对自身状态的感知：关节角、末端位置、夹爪开合等</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>success detection（成功检测）</td>
+<td>—</td>
+<td>判断一个子任务有没有完成，决定进入下一步、重试还是求助</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>system 2 / system 1</td>
+<td>—</td>
+<td>借用心理学"慢思考 / 快直觉"的说法：ER 是慢的 system 2，VLA 是快的 system 1</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>Thinking VLA</td>
+<td>—</td>
+<td>GR 1.5 的 VLA 在出动作前先生成一段自然语言思考（下一步、动作描述）</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>Trusted Tester（受信测试者）</td>
+<td>—</td>
+<td>Google 只对少数申请通过的外部用户开放模型的计划</td>
+<td><a href="../lessons/01-overview.html">第 1 章</a></td>
+</tr>
+</tbody>
+</table>
+</main></div>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/reading-gemini-robotics">github.com/wikieden/reading-gemini-robotics</a>。更多讲义书：<a href="https://wikieden.github.io/ai-books/">Physical AI 0-1-♾️（合集）</a></footer>
+<script>(function(){var d=document.documentElement,K=["s","m","l","xl"];
+function save(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
+var s=document.getElementById("ab-theme");if(s){s.value=d.dataset.theme||"";s.onchange=function(){if(s.value)d.dataset.theme=s.value;else delete d.dataset.theme;save("ab-theme",s.value)}}
+document.querySelectorAll("[data-fs-step]").forEach(function(b){b.onclick=function(){var i=K.indexOf(d.dataset.fs||"m")+(+b.dataset.fsStep);i=Math.max(0,Math.min(K.length-1,i));d.dataset.fs=K[i];save("ab-fs",K[i])}});
+var nb=document.getElementById("nav-toggle"),side=document.querySelector("nav.side");if(nb&&side){nb.onclick=function(){side.classList.toggle("open")}}
+var cur=side&&side.querySelector(".cur");if(cur)cur.scrollIntoView({block:"center"});
+})();</script>
+</body></html>

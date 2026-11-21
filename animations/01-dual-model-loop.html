@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双模型与动作块</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 1 章 · ER 编排 + VLA 动作块：慢大脑怎么跑出 50 Hz</h1>
+<p class="sub">配套讲义：<a href="../lessons/01-overview.html">第 1 章 · 全景：两个模型、八次发布</a>。ER 把任务拆成三步，每步要执行 45 个动作。VLA 的云端 backbone 每隔"延迟"毫秒送来一个动作块（新块替换旧块），机器人每 20 ms 执行一个动作（50 Hz）；块里的动作用完、新块还没到，机器人就卡住。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0 ms</div></div>
+<div class="stat"><div class="l">已执行 / 卡顿</div><div class="v" id="se">0 / 0 ms</div></div>
+<div class="stat"><div class="l">有效控制频率</div><div class="v" id="sh">—</div></div>
+<div class="stat"><div class="l">块能覆盖 / 延迟</div><div class="v" id="sc">—</div></div>
+</div>
+<div class="row ctl"><label>backbone 延迟 <b id="lv">250</b> ms</label><input id="lat" type="range" min="100" max="500" step="10" value="250"></div>
+<div class="row ctl"><label>chunk 长度 <b id="kv">10</b> 步</label><input id="k" type="range" min="4" max="30" step="1" value="10"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：块能覆盖的时长 = chunk × 20 ms。它比延迟短，每个周期末尾就有一段红色卡顿，有效频率掉到 chunk ÷ 延迟。延迟 250 ms 时，chunk 至少 13 步（12.5 向上取整）才不卡。把 chunk 拖到 13 看红色消失；再把延迟拖大，看要多长的 chunk 才够。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const T=3000,DT=20,STEP_MS=40,PER=45;
+const X0=40,W=620,PX=t=>X0+t/T*W;
+const TASKS=['① 拿起碗','② 打开柜门','③ 放进柜子'];
+// ER 轨
+txt('ER 编排（大脑）：拆任务、下发子指令、判断成没成功',{x:20,y:22,class:'m'},sv);
+const cards=TASKS.map((s,i)=>{const g=el('g',{},sv);const x=40+i*210;
+  const r=el('rect',{x,y:34,width:190,height:58,rx:8,fill:'var(--bg)',stroke:'var(--line)','stroke-width':1.5},g);
+  const t1=txt(s,{x:x+12,y:58},g);const t2=txt('待办',{x:x+12,y:80,class:'m'},g);
+  const bar=el('rect',{x:x+110,y:72,width:0,height:8,rx:3,fill:'var(--teal)'},g);
+  el('rect',{x:x+110,y:72,width:68,height:8,rx:3,fill:'none',stroke:'var(--line)'},g);
+  return {r,t2,bar}});
+// backbone 轨
+txt('VLA 云端 backbone：一次推理（灰）→ 送达一个动作块（蓝点）',{x:20,y:128,class:'m'},sv);
+const reqG=el('g',{},sv);
+// 控制轨
+txt('机器人本地，50 Hz：每格 20 ms，绿 = 执行一个动作，红 = 没动作可执行（卡顿），浅灰 = 开机等第一个块',{x:20,y:218,class:'m'},sv);
+const tickG=el('g',{},sv);
+// 时间轴
+el('line',{x1:X0,y1:300,x2:X0+W,y2:300,stroke:'var(--line)'},sv);
+[0,500,1000,1500,2000,2500,3000].forEach(t=>{el('line',{x1:PX(t),y1:296,x2:PX(t),y2:304,stroke:'var(--muted)'},sv);txt(t+' ms',{x:PX(t)-(t===T?44:14),y:320,class:'m'},sv)});
+const cur=el('line',{x1:X0,y1:120,x2:X0,y2:300,stroke:'var(--warm)','stroke-width':2},sv);
+const msg=txt('',{x:20,y:356},sv);const msg2=txt('',{x:20,y:380,class:'m'},sv);
+let t,buf,nextArr,reqStart,executed,stalled,task,prog,lat,K,lastMsg,doneAt;
+function reset(){lat=+$('lat').value;K=+$('k').value;t=0;buf=0;nextArr=lat;reqStart=0;executed=0;stalled=0;task=0;prog=0;doneAt=null;lastMsg='ER：把"把碗收进柜子"拆成三步，下发 ①';
+  clear(reqG);clear(tickG);drawReq(0,lat,false);draw()}
+function drawReq(a,b,done){const g=el('g',{},reqG);
+  el('rect',{x:PX(a),y:140,width:Math.max(1,PX(Math.min(b,T))-PX(a)-1),height:22,rx:3,fill:'var(--line)',opacity:done?0.9:0.5},g);
+  if(done&&b<=T){el('circle',{cx:PX(b),cy:180,r:5,fill:'var(--accent)'},g);
+    el('rect',{x:PX(b),y:188,width:Math.min(K*DT,T-b)/T*W,height:6,rx:2,fill:'var(--accent)',opacity:.35},g)}}
+function tick(){ // 推进一个 20 ms 控制步
+  while(nextArr<=t){clear(reqG.lastChild);reqG.removeChild(reqG.lastChild);drawReq(reqStart,nextArr,true);
+    buf=K;reqStart=nextArr;nextArr+=lat;drawReq(reqStart,nextArr,false)}
+  let c;
+  if(t<lat)c='var(--line)';
+  else if(task>=3)c='var(--card)';
+  else if(buf>0){buf--;executed++;prog++;c='var(--good)';
+    if(prog>=PER){prog=0;lastMsg='ER 成功检测：'+TASKS[task]+' 完成 ✓'+(task<2?' → 下发 '+TASKS[task+1].slice(0,1):' → 整个任务完成');task++;if(task>=3)doneAt=t+DT}}
+  else{stalled++;c='var(--bad)'}
+  el('rect',{x:PX(t)+0.3,y:232,width:W*DT/T-0.6,height:40,fill:c},tickG);
+  t+=DT}
+function next(){if(t>=T)return false;for(let i=0;i<STEP_MS/DT&&t<T;i++)tick();draw();return t<T}
+function draw(){cur.setAttribute('x1',PX(t));cur.setAttribute('x2',PX(t));
+  cards.forEach((c,i)=>{const st=i<task?'done':i===task?'run':'todo';
+    c.r.setAttribute('stroke',st==='done'?'var(--good)':st==='run'?'var(--accent)':'var(--line)');
+    c.t2.textContent=st==='done'?'✓ 成功检测通过':st==='run'?(t<lat?'等第一个动作块':'VLA 执行中'):'待办';
+    c.bar.setAttribute('width',68*(st==='done'?1:st==='run'?prog/PER:0))});
+  const busy=Math.max(0,(doneAt??t)-lat);
+  $('st').textContent=t+' ms';$('se').textContent=executed+' / '+stalled*DT+' ms';
+  $('sh').textContent=busy>0?(executed/busy*1000).toFixed(1)+' Hz':'—';
+  $('sc').textContent=K*DT+' / '+lat+' ms';
+  msg.textContent=lastMsg;
+  msg2.textContent='块覆盖 '+K+' × 20 = '+K*DT+' ms '+(K*DT>=lat?'≥':'<')+' 延迟 '+lat+' ms → '+(K*DT>=lat?'不卡顿':'每个周期卡 '+(lat-K*DT)+' ms，稳态 '+Math.min(50,K/lat*1000).toFixed(0)+' Hz')}
+$('lat').oninput=()=>{$('lv').textContent=$('lat').value;ANIM.stop();reset()};
+$('k').oninput=()=>{$('kv').textContent=$('k').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},120);
+</script><a href="https://wikieden.github.io/ai-books/" style="position:fixed;right:12px;bottom:12px;z-index:99;padding:4px 10px;border-radius:14px;background:rgba(127,127,127,.18);color:inherit;font:13px/1.6 system-ui,sans-serif;text-decoration:none">← 全部讲义书</a>
+</body></html>
